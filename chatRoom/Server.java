@@ -28,9 +28,7 @@ class Server
 	//服务器线程
 	public static class ServerThread extends Thread
 	{
-		private Socket socket;
-		private PrintWriter out=null;
-		private BufferedReader in=null;
+		public Socket socket;
 		public ServerThread(Socket socket){
 			this.socket=socket;
 			System.out.println("Client "+socket.getInetAddress().getHostAddress()+" 连入服务器");
@@ -38,32 +36,66 @@ class Server
 
 		@Override
 		public void run(){
+			new GetClientMsg(socket).start(); //开启线程
+			new SendToClient(socket).start();
+		}
+	}
+	//消费者线程(获取客户端消息)
+	public static class GetClientMsg extends Thread
+	{
+		private Socket socket;
+		private BufferedReader in=null;
+		public GetClientMsg(Socket socket){
+			this.socket=socket;
+		}
+		@Override
+		public void run(){
 			try{
-				
-				//向客户端发送消息
-				
-				out=new PrintWriter(socket.getOutputStream(),true);
-				//读取客户端发送的数据
 				in=new BufferedReader(new InputStreamReader(socket.getInputStream()));
 				while(true){
-					System.out.println(socket.getInetAddress().getHostAddress()+"say："+in.readLine());
-					Scanner sca=new Scanner(System.in);
-					out.println(sca.nextLine());
-					
+					System.out.println(socket.getInetAddress().getHostAddress()+" say: "+in.readLine());
 				}
 			}catch(Exception e){
-				System.out.println("读取或发送消息错误："+e.getMessage());
+				System.out.println("获取消息失败 "+e.getMessage());
 			}finally{
 				try{
-					if(socket!=null){
-						socket.close();
-						in.close();
-						out.close();
-					}
+					socket.close();
+					in.close();
 				}catch(Exception e){
-					System.out.println(e.getMessage());
+					e.printStackTrace();
+				}
+			}
+		}
+
+	}
+	//生产者线程(向客户端发送消息)
+	public static class SendToClient extends Thread
+	{
+		private Socket socket;
+		private PrintWriter out=null;
+		public SendToClient(Socket socket){
+			this.socket=socket;
+		}
+		@Override
+		public void run(){
+			try{
+				out=new PrintWriter(socket.getOutputStream(),true);
+				Scanner sc=new Scanner(System.in);
+				while(true){
+					out.println(sc.nextLine());
+				}
+			}catch(Exception e){
+				System.out.println("发送消息失败 "+e.getMessage());
+			}finally{
+				try{
+					socket.close();
+					out.close();
+				}catch(Exception e){
+					e.printStackTrace();
 				}
 			}
 		}
 	}
+
+
 }
