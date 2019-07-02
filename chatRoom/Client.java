@@ -15,6 +15,7 @@ public class Client
 			//创建请求并发送
 			Socket socket=new Socket(IP,PORT);
 			System.out.println("Successful to connect to Server");
+			System.out.println("Server say: Welcome!");
 			new ClientThread(socket).start(); //创建客户端线程并启动
 		}catch(Exception e){
 			System.out.println("服务器未启动"+e.getMessage());

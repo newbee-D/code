@@ -11,9 +11,9 @@ class Server
 
 	public static void main(String[] args) 
 	{
-		System.out.println("服务器已启动，等待客服端连接");
 		try{
-			ServerSocket ss=new ServerSocket(PORT,5); //监听端口请求，同时最多服务5个客户端
+			ServerSocket ss=new ServerSocket(PORT,5); //监听端口请求
+			System.out.println("服务器已启动，等待客服端连接");
 			while(true){
 				Socket socket=ss.accept();//从请求队列中选取一个请求
 				ServerThread st=new ServerThread(socket); //开启一个线程服务选取的请求
